@@ -1,0 +1,38 @@
+version: '3.7'
+services:
+  app:
+    build: ./app
+    container_name: urban_eats
+    restart: always
+    environment: 
+      - APP_ENV=${APP_ENV}
+    depends_on:
+      - db-postgres
+    expose: 
+        - 8080
+
+    
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+  
+  db-postgres:
+    image: "postgres:11.2"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=''
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=urban_eats
+
+  migration:
+    build: ./app
+    environment:
+      - APP_ENV=${APP_ENV}
+    command: flask db upgrade
+    depends_on:
+      - db-postgres
+
